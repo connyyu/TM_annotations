@@ -11,10 +11,11 @@ if base_dir not in sys.path:
     sys.path.insert(0, base_dir)
 
 try:
-    from tm_annotations.scripts import pdb_chainID
+    from scripts import pdb_chainID
+    st.success("Imported pdb_chainID successfully!")
 except ModuleNotFoundError as e:
     st.error(f"Import failed: {e}")
-    st.stop()  # Stop execution if import fails
+    st.stop()
     
 import py3Dmol
 import streamlit.components.v1 as components
