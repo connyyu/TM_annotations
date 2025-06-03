@@ -1,22 +1,7 @@
 import streamlit as st
 import sys
 import os
-
-# Streamlit page config must be first
-st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮")
-
-# Add the root of your repo (adjust as needed)
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-if base_dir not in sys.path:
-    sys.path.insert(0, base_dir)
-
-try:
-    from scripts import pdb_chainID
-    st.success("Imported pdb_chainID successfully!")
-except ModuleNotFoundError as e:
-    st.error(f"Import failed: {e}")
-    st.stop()
-    
+from scripts import pdb_chainID
 import py3Dmol
 import streamlit.components.v1 as components
 import requests
