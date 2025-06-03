@@ -265,7 +265,7 @@ def viewpdb(structure, pred, sequence, af2_tag):
             atom_color[nr] = '#008c74'
 
     try:
-        chain_ids = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)
+        result = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)
         raw_output = result.stdout.strip()
         if ',' in raw_output:
             chain_ids = raw_output.split(',')
