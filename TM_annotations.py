@@ -266,8 +266,8 @@ def viewpdb(structure, pred, sequence, af2_tag):
 
     try:
         chain_info, _ = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)
-        chain_ids = [entry['Chain ID'] for entry in chain_info if 'Chain ID' in entry]
-        chain_id = chain_ids[0] if chain_ids else None        
+        chain_ids_list = [entry['Chain ID'] for entry in chain_info if 'Chain ID' in entry]
+        chain_ids = ', '.join(chain_ids_list)        
     except Exception as e:
         chain_ids = []
         st.error(f"Failed to get chain IDs: {e}")
