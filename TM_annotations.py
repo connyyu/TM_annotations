@@ -389,7 +389,7 @@ with col1:
     af2_tag = 0
     viewpdb(pdb_structure, pred_uniprot, sequence, af2_tag)
     chain_ids = st.session_state.chain_ids
-    st.caption(f"PDB:{pdb_code} ({chain_ids}) with UniProt annotations on {uniprot_ac}.")
+    st.caption(f"PDB:{pdb_code} ({chain_ids}) with UniProt annotations for {uniprot_ac}.")
 
 # Display UniProt TM annotations (output)
 with col2:
