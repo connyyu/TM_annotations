@@ -9,7 +9,7 @@ import shutil
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import time
-from src.scripts import pdb_chainID
+from src.tm_annotations.scripts import pdb_chainID
 
 # Replaces stmol.showmol
 def showmol(view, height=500, width=500):
