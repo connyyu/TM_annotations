@@ -1,9 +1,4 @@
-python==3.10
 streamlit
 requests
 matplotlib
 py3Dmol
-git+https://github.com/napoles-uach/stmol.git
-ipython-genutils
-ipywidgets
-traitlets
