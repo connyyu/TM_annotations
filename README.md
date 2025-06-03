@@ -2,6 +2,8 @@
 
 This repository contains a Streamlit app that annotates transmembrane topology on protein structures using DeepTMHMM predictions and UniProt annotations.
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tm-annotations.streamlit.app/)
+
 ## Features
 
 - Retrieves transmembrane topology annotations from a UniProt entry.
@@ -11,8 +13,6 @@ This repository contains a Streamlit app that annotates transmembrane topology o
 ### Input
 - **UniProt accession**
 - **PDB code**
-
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tm-annotations.streamlit.app/)
 
 ## Prerequisites
 
