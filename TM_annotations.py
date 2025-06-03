@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 import requests
 import subprocess
 import os
-import sys
+from biolib import load_app
 import re
 import shutil
 import matplotlib.pyplot as plt
@@ -177,45 +177,43 @@ def run_deeptmhmm_biolib(sequence):
     progress_bar.progress(20)
     time.sleep(0.5)
 
-    # Write the sequence to a temporary FASTA file
-    with open(fasta_file, "w") as f:
+    fasta_path = os.path.join(script_dir, "input.fasta")
+    with open(fasta_path, "w") as f:
         f.write(f">sequence\n{sequence}")
-    
-    # Step 3: Run DeepTMHMM prediction in the output directory
-    status_container.info("🔬 Running DeepTMHMM prediction... This may take a few minutes.")
-    progress_bar.progress(30)
 
-    biolib_path = os.path.join(os.path.dirname(sys.executable), "biolib")
-    command = [biolib_path, "run", "DTU/DeepTMHMM", "--fasta", "input.fasta"]
-    
+    # Step 3: Run DeepTMHMM prediction
+    status_container.info("🔬 Running DeepTMHMM prediction... This may take a few minutes.")
+    progress_bar.progress(40)
+
     try:
-        result = subprocess.run(command, capture_output=True, text=True, cwd=script_dir)
-        
-        # Step 4: Processing results
-        status_container.info("📊 Processing prediction results...")
+        app = load_app("DTU/DeepTMHMM")
+        job = app.run(fasta=fasta_path)
+        job.wait()  # This blocks until the job finishes
+
+        # Step 4: Save results
+        status_container.info("💾 Saving prediction results...")
         progress_bar.progress(80)
-        time.sleep(0.5)
-        
-        if result.returncode == 0:
-            gff3_path = os.path.join(output_dir, "TMRs.gff3")
+        results_dir = job.save_files(output_dir)
+
+        gff3_path = os.path.join(results_dir, "TMRs.gff3")
+        if os.path.exists(gff3_path):
             tm_helices, ss_tag = extract_tm_helices(gff3_path)
-            
+
             # Step 5: Complete
             status_container.success("✅ DeepTMHMM prediction completed successfully!")
             progress_bar.progress(100)
             time.sleep(1)
-            
-            # Clear status indicators after success
             status_container.empty()
             progress_bar.empty()
-            
-            return tm_helices, output_dir
+
+            return tm_helices, results_dir
         else:
-            status_container.error(f"❌ Error running DeepTMHMM: {result.stderr}")
+            status_container.error("❌ DeepTMHMM did not generate expected output (TMRs.gff3 missing).")
             progress_bar.empty()
             return None, None
+
     except Exception as e:
-        status_container.error(f"❌ Unexpected error: {e}")
+        status_container.error(f"❌ Unexpected error during DeepTMHMM prediction: {e}")
         progress_bar.empty()
         return None, None
 
