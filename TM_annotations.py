@@ -9,6 +9,7 @@ import shutil
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import time
+from src.scripts import pdb_chainID
 
 # Replaces stmol.showmol
 def showmol(view, height=500, width=500):
@@ -263,16 +264,7 @@ def viewpdb(structure, pred, sequence, af2_tag):
             atom_color[nr] = '#008c74'
 
     try:
-        result = subprocess.run(
-            ["python3", script_path, pdb_code, uniprot_ac],
-            capture_output=True,
-            text=True
-        )
-        raw_output = result.stdout.strip()
-        if ',' in raw_output:
-            chain_ids = raw_output.split(',')
-        else:
-            chain_ids = raw_output.split()
+        chain_ids = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)
 
         if not chain_ids:
             chain_ids = ['A']
