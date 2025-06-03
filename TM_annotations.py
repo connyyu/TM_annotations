@@ -264,7 +264,7 @@ def viewpdb(structure, pred, sequence, af2_tag):
 
     try:
         result = subprocess.run(
-            ["python", script_path, pdb_code, uniprot_ac],
+            ["python3", script_path, pdb_code, uniprot_ac],
             capture_output=True,
             text=True
         )
