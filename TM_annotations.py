@@ -12,8 +12,8 @@ import time
 
 # Replaces stmol.showmol
 def showmol(view, height=500, width=500):
-    component_html = view._make_html().replace("'", '"')
-    components.html(component_html, height=height, width=width)
+    html = view._make_html()
+    components.html(html, height=height, width=width)
 
 # Sidebar, title, parameters
 st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮")
@@ -235,8 +235,8 @@ def read_demo_results():
 
 # Function to display the structure visualization
 def viewpdb(structure, pred, sequence, af2_tag):
-    view = py3Dmol.view(js='https://3dmol.org/build/3Dmol.js', height=360, width=400)
-    view.addModelsAsFrames(structure)
+    view = py3Dmol.view(height=360, width=400)
+    view.addModel(structure, 'mmcif')
     view.setBackgroundColor('#eeeeee')
     view.spin(False)
 
@@ -272,7 +272,6 @@ def viewpdb(structure, pred, sequence, af2_tag):
             chain_ids = raw_output.split()
 
         if not chain_ids:
-            st.warning("No chain IDs found. Using default 'A'.")
             chain_ids = ['A']
     except Exception as e:
         st.error(f"Error fetching chain IDs: {e}")
