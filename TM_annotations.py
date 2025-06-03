@@ -1,6 +1,6 @@
 import streamlit as st
 import py3Dmol
-from stmol import showmol
+import streamlit.components.v1 as components
 import requests
 import subprocess
 import os
@@ -10,14 +10,17 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import time
 
+# Replaces stmol.showmol
+def showmol(view, height=500, width=500):
+    component_html = view._make_html().replace("'", '"')
+    components.html(component_html, height=height, width=width)
+
 # Sidebar, title, parameters
-# -----------------------------------------------------------------------------
 st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮")
 
-default_unp = 'Q63008'   #'P21796, Q63008, Q9H2X9'
-default_pdb = '7UV0'   #'8J0O, 7UV0, 6M23'
+default_unp = 'Q63008'
+default_pdb = '7UV0'
 
-# Input UniProt AC to fetch seq and TM annotation; PDB code to fetch structure
 with st.sidebar:
     st.header("📝 New query")
     uniprot_ac = st.text_input("Enter UniProt AC:", default_unp)
@@ -232,64 +235,57 @@ def read_demo_results():
 
 # Function to display the structure visualization
 def viewpdb(structure, pred, sequence, af2_tag):
-    # Initialize 3D viewer
     view = py3Dmol.view(js='https://3dmol.org/build/3Dmol.js', height=360, width=400)
     view.addModelsAsFrames(structure)
     view.setBackgroundColor('#eeeeee')
     view.spin(False)
 
-    # Define atom colors based on prediction
     atom_color = dict()
     for nr, res_type in enumerate(pred):
-        if res_type == 'O':  # outside
+        if res_type == 'O':
             atom_color[nr] = 'powderblue'
-        elif res_type == 'M':  # TM helix
+        elif res_type == 'M':
             atom_color[nr] = '#830592'
-        elif res_type == 'I':  # inside
+        elif res_type == 'I':
             atom_color[nr] = 'pink'
-        elif res_type == 'B':  # TM betastrand
+        elif res_type == 'B':
             atom_color[nr] = '#830592'
-        elif res_type == 'P':  # periplasm
+        elif res_type == 'P':
             atom_color[nr] = 'green'
-        elif res_type == 'S':  # signal
+        elif res_type == 'S':
             atom_color[nr] = 'orange'
-        elif res_type == 'g':  # no prediction
+        elif res_type == 'g':
             atom_color[nr] = 'lightgrey'
         else:
             atom_color[nr] = '#008c74'
 
-    # Extract chain IDs using subprocess
     try:
         result = subprocess.run(
             ["python", script_path, pdb_code, uniprot_ac],
             capture_output=True,
             text=True
         )
-
         raw_output = result.stdout.strip()
         if ',' in raw_output:
-            chain_ids = raw_output.split(',')  # Split by comma if comma-separated
+            chain_ids = raw_output.split(',')
         else:
-            chain_ids = raw_output.split()  # Split by whitespace otherwise
+            chain_ids = raw_output.split()
 
         if not chain_ids:
             st.warning("No chain IDs found. Using default 'A'.")
-            chain_ids = ['A']  # Default to chain 'A'
+            chain_ids = ['A']
     except Exception as e:
         st.error(f"Error fetching chain IDs: {e}")
-        chain_ids = ['A']  # Default to chain 'A' if subprocess fails
+        chain_ids = ['A']
 
-    # Save chain_ids in session state
     if 'chain_ids' not in st.session_state:
         st.session_state.chain_ids = raw_output
     else:
-        st.session_state.chain_ids = raw_output  # Update the value
+        st.session_state.chain_ids = raw_output
 
-    # Ignore chain ID for alphafold models
     if af2_tag == 1:
         chain_ids = ['A']
     
-    # Apply styles to each chain
     for chain_id in chain_ids:
         view.setStyle({'model': -1, 'chain': chain_id}, {
             'cartoon': {
@@ -298,7 +294,6 @@ def viewpdb(structure, pred, sequence, af2_tag):
             }
         })
 
-    # Finalize visualization
     view.zoomTo()
     showmol(view, height=360, width=400)
     chain_ids = st.session_state.chain_ids
