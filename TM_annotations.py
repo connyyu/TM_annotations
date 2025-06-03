@@ -4,6 +4,7 @@ import streamlit.components.v1 as components
 import requests
 import subprocess
 import os
+import sys
 import re
 import shutil
 import matplotlib.pyplot as plt
@@ -183,11 +184,12 @@ def run_deeptmhmm_biolib(sequence):
     # Step 3: Run DeepTMHMM prediction in the output directory
     status_container.info("🔬 Running DeepTMHMM prediction... This may take a few minutes.")
     progress_bar.progress(30)
-    
-    command = f"biolib run DTU/DeepTMHMM --fasta {fasta_file}"
+
+    biolib_path = os.path.join(os.path.dirname(sys.executable), "biolib")
+    command = [biolib_path, "run", "DTU/DeepTMHMM", "--fasta", "input.fasta"]
     
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True, cwd=script_dir)
+        result = subprocess.run(command, capture_output=True, text=True, cwd=script_dir)
         
         # Step 4: Processing results
         status_container.info("📊 Processing prediction results...")
