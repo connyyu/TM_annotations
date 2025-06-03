@@ -16,8 +16,8 @@ This repository contains a Streamlit app that annotates transmembrane topology o
 
 ## Prerequisites
 
-- **Python 3.x**
-- Python libraries: `requests`, `csv`, `re`, `sys`, `defaultdict` from `collections`.
+- **Python 3.10**
+- Python libraries: `streamlit`, `py3Dmol`, `stmol`, `ipython-genutils`, `requests`, `matplotlib`.
     
 ## Author
 
