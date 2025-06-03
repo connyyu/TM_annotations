@@ -1,35 +1,30 @@
 import streamlit as st
+import sys
+import os
+
+# Streamlit page config must be first
+st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮")
+
+# Add the root of your repo (adjust as needed)
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
+
+try:
+    from tm_annotations.scripts import pdb_chainID
+except ModuleNotFoundError as e:
+    st.error(f"Import failed: {e}")
+    st.stop()  # Stop execution if import fails
+    
 import py3Dmol
 import streamlit.components.v1 as components
 import requests
 import subprocess
-import os
-import sys
 import re
 import shutil
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import time
-
-# Add the absolute path to the root of your repo (adjust this if needed)
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
-# Print sys.path so you can see where Python is looking for modules
-st.write("Python sys.path:", sys.path)
-
-try:
-    # Use current working directory instead of __file__
-    base_dir = os.getcwd()
-    sys.path.insert(0, os.path.abspath(os.path.join(base_dir, 'src')))
-    st.write("Python sys.path:", sys.path)
-except Exception as e:
-    st.write("Error adjusting sys.path:", e)
-
-try:
-    from tm_annotations.scripts import pdb_chainID
-    st.write("Import succeeded!")
-except ModuleNotFoundError as e:
-    st.write("Import failed:", str(e))
 
 # Replaces stmol.showmol
 def showmol(view, height=500, width=500):
