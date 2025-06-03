@@ -17,7 +17,15 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 st.write("Python sys.path:", sys.path)
 
 try:
-    from src.tm_annotations.scripts import pdb_chainID
+    # Use current working directory instead of __file__
+    base_dir = os.getcwd()
+    sys.path.insert(0, os.path.abspath(os.path.join(base_dir, 'src')))
+    st.write("Python sys.path:", sys.path)
+except Exception as e:
+    st.write("Error adjusting sys.path:", e)
+
+try:
+    from tm_annotations.scripts import pdb_chainID
     st.write("Import succeeded!")
 except ModuleNotFoundError as e:
     st.write("Import failed:", str(e))
