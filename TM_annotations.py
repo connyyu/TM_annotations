@@ -265,12 +265,7 @@ def viewpdb(structure, pred, sequence, af2_tag):
             atom_color[nr] = '#008c74'
 
     try:
-        result = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)
-        raw_output = result.stdout.strip()
-        if ',' in raw_output:
-            chain_ids = raw_output.split(',')
-        else:
-            chain_ids = raw_output.split()
+        chain_ids = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)
 
         if not chain_ids:
             chain_ids = ['A']
@@ -279,9 +274,9 @@ def viewpdb(structure, pred, sequence, af2_tag):
         chain_ids = ['A']
 
     if 'chain_ids' not in st.session_state:
-        st.session_state.chain_ids = raw_output
+        st.session_state.chain_ids = chain_ids
     else:
-        st.session_state.chain_ids = raw_output
+        st.session_state.chain_ids = chain_ids
 
     if af2_tag == 1:
         chain_ids = ['A']
