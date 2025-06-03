@@ -265,7 +265,14 @@ def viewpdb(structure, pred, sequence, af2_tag):
             atom_color[nr] = '#008c74'
 
     try:
-        chain_ids = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)
+        chain_info, _ = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)  # unpack tuple
+        
+        # Extract only the 'Chain ID' values from each dict in chain_info list
+        chain_ids = [entry['Chain ID'] for entry in chain_info if 'Chain ID' in entry]
+        
+    except Exception as e:
+        chain_ids = []
+        st.error(f"Failed to get chain IDs: {e}")
 
         if not chain_ids:
             chain_ids = ['A']
