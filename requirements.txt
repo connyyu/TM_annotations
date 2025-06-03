@@ -1,5 +1,7 @@
+python==3.10
 streamlit
 py3Dmol
 stmol
+ipython-genutils
 requests
 matplotlib
