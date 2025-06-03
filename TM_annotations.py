@@ -9,7 +9,18 @@ import shutil
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import time
-from src.tm_annotations.scripts import pdb_chainID
+
+# Add the absolute path to the root of your repo (adjust this if needed)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+# Print sys.path so you can see where Python is looking for modules
+st.write("Python sys.path:", sys.path)
+
+try:
+    from src.tm_annotations.scripts import pdb_chainID
+    st.write("Import succeeded!")
+except ModuleNotFoundError as e:
+    st.write("Import failed:", str(e))
 
 # Replaces stmol.showmol
 def showmol(view, height=500, width=500):
