@@ -2,5 +2,4 @@ streamlit
 requests
 matplotlib
 py3Dmol
-deeptmhmm
 biolib
