@@ -266,6 +266,11 @@ def viewpdb(structure, pred, sequence, af2_tag):
 
     try:
         chain_ids = pdb_chainID.get_chain_ids(pdb_code, uniprot_ac)
+        raw_output = result.stdout.strip()
+        if ',' in raw_output:
+            chain_ids = raw_output.split(',')
+        else:
+            chain_ids = raw_output.split()
 
         if not chain_ids:
             chain_ids = ['A']
