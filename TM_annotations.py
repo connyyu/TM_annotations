@@ -160,12 +160,12 @@ def extract_tm_helices(gff3_file):
 
 # Function to run DeepTMHMM prediction
 def run_deeptmhmm_biolib(sequence):
-    # Create status containers
+    # Status UI
     status_container = st.empty()
     progress_bar = st.progress(0)
     
     # Step 1: Clear old results
-    status_container.info("🧹 Clearing previous results...")
+    status_container.info("Clearing previous results...")
     progress_bar.progress(10)
     time.sleep(0.5)
 
@@ -173,7 +173,7 @@ def run_deeptmhmm_biolib(sequence):
     clear_old_results()
 
     # Step 2: Write FASTA file
-    status_container.info("📝 Writing sequence to FASTA file...")
+    status_container.info("Writing sequence to FASTA file...")
     progress_bar.progress(20)
     time.sleep(0.5)
 
@@ -181,40 +181,44 @@ def run_deeptmhmm_biolib(sequence):
     with open(fasta_path, "w") as f:
         f.write(f">sequence\n{sequence}")
 
-    # Step 3: Run DeepTMHMM prediction
-    status_container.info("🔬 Running DeepTMHMM prediction... This may take a few minutes.")
+    # Step 3: Run DeepTMHMM via biolib CLI
+    status_container.info("Running DeepTMHMM prediction... This may take a few minutes.")
     progress_bar.progress(40)
 
+    command = [
+        "biolib", "run", "DTU/DeepTMHMM",
+        "--fasta", fasta_path,
+        "--output-dir", output_dir
+    ]
+
     try:
-        app = load_app("DTU/DeepTMHMM")
-        job = app.run(fasta=fasta_path)
-        job.wait()  # This blocks until the job finishes
+        result = subprocess.run(command, capture_output=True, text=True, cwd=script_dir)
 
-        # Step 4: Save results
-        status_container.info("💾 Saving prediction results...")
+        # Step 4: Check results
+        status_container.info("Processing prediction results...")
         progress_bar.progress(80)
-        results_dir = job.save_files(output_dir)
+        time.sleep(0.5)
 
-        gff3_path = os.path.join(results_dir, "TMRs.gff3")
-        if os.path.exists(gff3_path):
-            tm_helices, ss_tag = extract_tm_helices(gff3_path)
+        if result.returncode == 0:
+            gff3_path = os.path.join(output_dir, "TMRs.gff3")
+            if os.path.exists(gff3_path):
+                tm_helices, ss_tag = extract_tm_helices(gff3_path)
 
-            # Step 5: Complete
-            status_container.success("✅ DeepTMHMM prediction completed successfully!")
-            progress_bar.progress(100)
-            time.sleep(1)
-            status_container.empty()
-            progress_bar.empty()
-
-            return tm_helices, results_dir
+                status_container.success("✅ DeepTMHMM prediction completed successfully!")
+                progress_bar.progress(100)
+                time.sleep(1)
+                status_container.empty()
+                progress_bar.empty()
+                return tm_helices, output_dir
+            else:
+                status_container.error("❌ Prediction ran but output file is missing.")
+                return None, None
         else:
-            status_container.error("❌ DeepTMHMM did not generate expected output (TMRs.gff3 missing).")
-            progress_bar.empty()
+            status_container.error(f"❌ Error running DeepTMHMM:\n{result.stderr}")
             return None, None
 
     except Exception as e:
-        status_container.error(f"❌ Unexpected error during DeepTMHMM prediction: {e}")
-        progress_bar.empty()
+        status_container.error(f"❌ Unexpected error: {e}")
         return None, None
 
 # Function to read demo DeepTMHMM prediction for default_unp
