@@ -187,32 +187,30 @@ def run_deeptmhmm_biolib(sequence):
     status_container.info("Running DeepTMHMM prediction... This may take a few minutes.")
     progress_bar.progress(40)
 
-    deeptmhmm = biolib.load('DTU/DeepTMHMM')
-    deeptmhmm_job = deeptmhmm.cli(args=f'--fasta {fasta_path}')
-    deeptmhmm_job.save_files(output_dir)
-    
     try:
-        # Wait for the job to complete (biolib jobs may be asynchronous)
-        deeptmhmm_job.wait()
+        deeptmhmm = biolib.load('DTU/DeepTMHMM')
+        deeptmhmm_job = deeptmhmm.cli(args=f'--fasta {fasta_path}')
         
-        # Check if job completed successfully
-        if deeptmhmm_job.status == 'completed':
-            gff3_path = os.path.join(output_dir, "TMRs.gff3")
-            if os.path.exists(gff3_path):
-                tm_helices, ss_tag = extract_tm_helices(gff3_path)
-                status_container.success("✅ DeepTMHMM prediction completed successfully!")
-                progress_bar.progress(100)
-                time.sleep(1)
-                status_container.empty()
-                progress_bar.empty()
-                return tm_helices, output_dir
-            else:
-                status_container.error("❌ Prediction ran but output file is missing.")
-                return None, None
+        # Step 4: Check results
+        status_container.info("Processing prediction results...")
+        progress_bar.progress(80)
+        time.sleep(0.5)
+        
+        # Save files to output directory
+        deeptmhmm_job.save_files(output_dir)
+        
+        # Check if the output file was created successfully
+        gff3_path = os.path.join(output_dir, "TMRs.gff3")
+        if os.path.exists(gff3_path):
+            tm_helices, ss_tag = extract_tm_helices(gff3_path)
+            status_container.success("✅ DeepTMHMM prediction completed successfully!")
+            progress_bar.progress(100)
+            time.sleep(1)
+            status_container.empty()
+            progress_bar.empty()
+            return tm_helices, output_dir
         else:
-            # Get error information from the job
-            error_msg = getattr(deeptmhmm_job, 'error', 'Unknown error occurred')
-            status_container.error(f"❌ Error running DeepTMHMM: {error_msg}")
+            status_container.error("❌ Prediction ran but output file is missing.")
             return None, None
             
     except Exception as e:
