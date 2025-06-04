@@ -30,6 +30,8 @@ with st.sidebar:
     fetch_data_button = st.button("Fetch data")
     pdb_code = st.text_input("Enter PDB code:", default_pdb)
     fetch_pdb_button = st.button("Show structure")
+    if fetch_data_button:
+        st.session_state.data_fetched = True
 
 st.sidebar.markdown("[UniProt annotation](#pdb-uniprot)")
 st.sidebar.markdown("[DeepTMHMM prediction](#pdb-tmhmm)")
@@ -314,6 +316,14 @@ def get_pred_from_file():
 
 # PDB with UniProt annotation
 # -----------------------------------------------------------------------------
+if not st.session_state.get('data_fetched', False):
+    st.info("""  
+    1. Enter UniProt AC and click **Fetch data** in the sidebar
+    2. Enter PDB code and click **Show structure** in the sidebar
+    3. Run a DeepTMHMM prediction using the **Run TM prediction** button (optional)
+    4. To refresh the viewer, click the **Show structure with TM prediction** button
+    """)
+
 
 col1, col2, col3 = st.columns([1, 1, 2])
 with col1:
