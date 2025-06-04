@@ -1,4 +1,1 @@
-build-essential
-wget
-curl
-git
+pip3
