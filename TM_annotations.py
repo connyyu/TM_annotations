@@ -321,11 +321,11 @@ def get_pred_from_file():
 # -----------------------------------------------------------------------------
 if st.session_state.get('guide', False):
     st.info("""
-    In this sequence:
+    In this order:
     1. Enter UniProt AC and **Fetch data**
-    2. Enter PDB code and **Show structure**
-    Run a DeepTMHMM prediction using the **Run TM prediction** button (optional).
-    Use the **Show structure with TM prediction** button to refresh the viewer.
+    2. Enter PDB code and **Show structure**  
+    Run a DeepTMHMM prediction using the **Run TM prediction** button (optional).  
+    Use the **Show structure with TM prediction** button to refresh the viewer.  
     """)
 
 
