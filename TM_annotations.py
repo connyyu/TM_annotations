@@ -531,3 +531,10 @@ st.markdown(
     The transmembrane topology prediction was generated using [DeepTMHMM](https://dtu.biolib.com/DeepTMHMM).
     """
 )
+
+st.markdown("""
+    <a href='https://github.com/connyyu' target='_blank'>
+        <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1024px-Octicons-mark-github.svg.png' 
+        style='position: fixed; bottom: 5%; left: 10%; transform: translateX(-50%); width: 30px; height: 30px;'/>
+    </a>
+""", unsafe_allow_html=True)
