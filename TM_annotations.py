@@ -30,12 +30,14 @@ with st.sidebar:
     fetch_data_button = st.button("Fetch data")
     pdb_code = st.text_input("Enter PDB code:", default_pdb)
     fetch_pdb_button = st.button("Show structure")
-    if fetch_data_button:
-        st.session_state.data_fetched = True
 
 st.sidebar.markdown("[UniProt annotation](#pdb-uniprot)")
 st.sidebar.markdown("[DeepTMHMM prediction](#pdb-tmhmm)")
 st.sidebar.markdown("[DeepTMHMM plot](#tmhmm_plot)")
+guide = st.button("Instructions", type="tertiary")
+if guide:
+    st.session_state.guide = True
+
 st.sidebar.markdown("""
     <a href='https://github.com/connyyu' target='_blank'>
         <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1024px-Octicons-mark-github.svg.png' 
@@ -316,7 +318,7 @@ def get_pred_from_file():
 
 # PDB with UniProt annotation
 # -----------------------------------------------------------------------------
-if not st.session_state.get('data_fetched', False):
+if st.session_state.get('guide', False):
     st.info("""  
     1. Enter UniProt AC and click **Fetch data** in the sidebar
     2. Enter PDB code and click **Show structure** in the sidebar
