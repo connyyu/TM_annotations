@@ -31,12 +31,12 @@ with st.sidebar:
     pdb_code = st.text_input("Enter PDB code:", default_pdb)
     fetch_pdb_button = st.button("Show structure")
 
-st.sidebar.markdown("[UniProt annotation](#pdb-uniprot)")
-st.sidebar.markdown("[DeepTMHMM prediction](#pdb-tmhmm)")
-st.sidebar.markdown("[DeepTMHMM plot](#tmhmm_plot)")
-guide = st.button("Instructions", type="tertiary")
-if guide:
-    st.session_state.guide = True
+    st.sidebar.markdown("[UniProt annotation](#pdb-uniprot)")
+    st.sidebar.markdown("[DeepTMHMM prediction](#pdb-tmhmm)")
+    st.sidebar.markdown("[DeepTMHMM plot](#tmhmm_plot)")
+    guide = st.button("Instructions", type="tertiary")
+    if guide:
+        st.session_state.guide = True
 
 st.sidebar.markdown("""
     <a href='https://github.com/connyyu' target='_blank'>
