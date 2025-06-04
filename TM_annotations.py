@@ -34,7 +34,7 @@ with st.sidebar:
 st.sidebar.markdown("[UniProt annotation](#pdb-uniprot)")
 st.sidebar.markdown("[DeepTMHMM prediction](#pdb-tmhmm)")
 st.sidebar.markdown("[DeepTMHMM plot](#tmhmm_plot)")
-st.markdown("""
+st.sidebar.markdown("""
     <a href='https://github.com/connyyu' target='_blank'>
         <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1024px-Octicons-mark-github.svg.png' 
         style='position: fixed; bottom: 5%; left: 10%; transform: translateX(-50%); width: 30px; height: 30px;'/>
@@ -538,4 +538,9 @@ st.markdown(
     """
 )
 
-
+st.markdown("""
+    <a href='https://github.com/connyyu' target='_blank'>
+        <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1024px-Octicons-mark-github.svg.png' 
+        style='position: fixed; bottom: 5%; left: 10%; transform: translateX(-50%); width: 30px; height: 30px;'/>
+    </a>
+""", unsafe_allow_html=True)
