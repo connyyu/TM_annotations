@@ -26,9 +26,9 @@ default_pdb = '7UV0'
 
 with st.sidebar:
     st.header("📝 New query")
-    uniprot_ac = st.text_input("Enter UniProt AC:", default_unp)
+    uniprot_ac = st.text_input("Enter UniProt AC:", default_unp).strip()
     fetch_data_button = st.button("Fetch data")
-    pdb_code = st.text_input("Enter PDB code:", default_pdb)
+    pdb_code = st.text_input("Enter PDB code:", default_pdb).strip()
     fetch_pdb_button = st.button("Show structure")
     if fetch_data_button:
         st.session_state.guide = False
