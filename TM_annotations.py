@@ -171,7 +171,7 @@ def run_deeptmhmm_biolib(sequence):
     progress_bar.progress(10)
     time.sleep(0.5)
 
-    output_dir = os.path.join(script_dir, "biolib_results")
+    output_dir_local = os.path.join(script_dir, "biolib_results")
     clear_old_results()
 
     # Step 2: Write FASTA file
@@ -191,16 +191,16 @@ def run_deeptmhmm_biolib(sequence):
         deeptmhmm = biolib.load('DTU/DeepTMHMM')
         deeptmhmm_job = deeptmhmm.cli(args=f'--fasta {fasta_path}')
         
-        # Step 4: Check results
+        # Step 4: Save results and check
         status_container.info("Processing prediction results...")
         progress_bar.progress(80)
         time.sleep(0.5)
         
         # Save files to output directory
-        deeptmhmm_job.save_files(output_dir)
+        deeptmhmm_job.save_files(output_dir_local)
         
         # Check if the output file was created successfully
-        gff3_path = os.path.join(output_dir, "TMRs.gff3")
+        gff3_path = os.path.join(output_dir_local, "TMRs.gff3")
         if os.path.exists(gff3_path):
             tm_helices, ss_tag = extract_tm_helices(gff3_path)
             status_container.success("✅ DeepTMHMM prediction completed successfully!")
@@ -208,14 +208,89 @@ def run_deeptmhmm_biolib(sequence):
             time.sleep(1)
             status_container.empty()
             progress_bar.empty()
-            return tm_helices, output_dir
+            return tm_helices, output_dir_local
         else:
             status_container.error("❌ Prediction ran but output file is missing.")
+            status_container.empty()
+            progress_bar.empty()
             return None, None
             
     except Exception as e:
-        status_container.error(f"❌ Unexpected error: {e}")
+        status_container.error(f"❌ Unexpected error: {str(e)}")
+        status_container.empty()
+        progress_bar.empty()
         return None, None
+
+if fetch_pred_button:
+    # Fetch sequence and structure
+    sequence = fetch_uniprot_sequence(uniprot_ac)
+    if sequence is None:
+        st.stop()
+    
+    tm_helices_pred, output_dir_result = run_deeptmhmm_biolib(sequence)
+    
+    if tm_helices_pred is None or output_dir_result is None:
+        st.warning("DeepTMHMM Prediction has failed.")
+        # Set output_dir to None to prevent errors in downstream code
+        output_dir = None
+        pred = ""
+    else:
+        # Update the global output_dir only if prediction succeeded
+        output_dir = output_dir_result
+        pred = get_pred_from_file()
+
+with col2:
+    output_str = ""
+    if uniprot_ac == default_unp:
+        gff3_path = os.path.join(demo_dir, "TMRs.gff3")
+    else:
+        # Check if output_dir is valid before using it
+        if output_dir is not None and os.path.exists(output_dir):
+            gff3_path = os.path.join(output_dir, "TMRs.gff3")
+        else:
+            gff3_path = None
+            
+    if gff3_path and os.path.exists(gff3_path):
+        st.markdown("")
+        tm_helices, ss_tag = extract_tm_helices(gff3_path)
+        if ss_tag == None:
+            st.error(f"No TM prediction available.")
+            print (f"Error in tm_helices: {tm_helices}")
+        else:
+            for start, end in tm_helices:
+                if ss_tag == "helix":
+                    output_str += f"FT TRANSMEM  {start}  {end} Helical\n"
+                elif ss_tag == "beta":
+                    output_str += f"FT TRANSMEM  {start}  {end} Beta stranded\n"
+
+        st.markdown(f"```\n{output_str}\n```")
+        st.markdown(
+    '<div style="display: flex; padding: 8px; width: 100%;">'
+    '<span style="background-color: white; padding: 2px 5px; text-align: center; font-size: 14px;">Key: </span>'
+    '<span style="background-color: powderblue; padding: 2px 5px; text-align: center; font-size: 14px;">Outside</span>'
+    '<span style="background-color: pink; padding: 2px 5px; text-align: center; font-size: 14px;">Inside</span>'
+    '</div>', unsafe_allow_html=True)
+    else:
+        st.warning("No TM prediction available.")
+
+if uniprot_ac == default_unp:
+    plot_path = os.path.join(demo_dir, "plot.png")
+else:
+    # Check if output_dir is valid before using it
+    if output_dir is not None and os.path.exists(output_dir):
+        plot_path = os.path.join(output_dir, "plot.png")
+    else:
+        plot_path = None
+
+st.markdown("<a name='tmhmm_plot'></a>", unsafe_allow_html=True)
+if plot_path and os.path.exists(plot_path):
+    st.markdown("##### DeepTMHMM Plot")
+    img = mpimg.imread(plot_path)
+    plt.imshow(img)
+    plt.axis('off')
+    st.pyplot(plt)
+else:
+    st.warning("TM prediction not available.")
 
 # Function to read demo DeepTMHMM prediction for default_unp
 def read_demo_results():
@@ -296,6 +371,10 @@ def viewpdb(structure, pred, sequence, af2_tag):
 # Read the TM prediction file (predicted_topologies.3line)
 def get_pred_from_file():
     pred = ""
+    # Make sure output_dir is valid before trying to use it
+    if output_dir is None or not os.path.exists(output_dir):
+        return pred
+        
     file_path = os.path.join(output_dir, "predicted_topologies.3line")
     if os.path.exists(file_path):
         with open(file_path, "r") as f:
