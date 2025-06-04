@@ -30,11 +30,12 @@ with st.sidebar:
     fetch_data_button = st.button("Fetch data")
     pdb_code = st.text_input("Enter PDB code:", default_pdb)
     fetch_pdb_button = st.button("Show structure")
-
+    if fetch_pdb_button:
+        st.session_state.guide = False
     st.sidebar.markdown("[UniProt annotation](#pdb-uniprot)")
     st.sidebar.markdown("[DeepTMHMM prediction](#pdb-tmhmm)")
     st.sidebar.markdown("[DeepTMHMM plot](#tmhmm_plot)")
-    guide = st.button("Instructions", type="tertiary")
+    guide = st.button("Instructions", type="secondary")
     if guide:
         st.session_state.guide = True
 
