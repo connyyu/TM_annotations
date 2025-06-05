@@ -13,11 +13,6 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import time
 
-# Replaces stmol.showmol
-def showmol(view, height=500, width=500):
-    html = view._make_html()
-    components.html(html, height=height, width=width)
-
 # Sidebar, title, parameters
 st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮")
 
@@ -242,6 +237,11 @@ def read_demo_results():
             if len(lines) > 2:
                 pred = lines[2].strip()
     return tm_helices, output_dir_demo, pred
+
+# Replaces stmol.showmol
+def showmol(view, height=500, width=500):
+    html = view._make_html()
+    components.html(html, height=height, width=width)
 
 # Function to display the structure visualization
 def viewpdb(structure, pred, sequence, af2_tag):
