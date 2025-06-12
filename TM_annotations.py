@@ -48,10 +48,6 @@ script_dir = os.path.dirname(os.path.abspath(__file__)) # location of pages dire
 output_dir = os.path.join(script_dir, "biolib_results")
 demo_dir = os.path.join(script_dir, "demo_results") # Use demo_results for Q63008
 pdb_dir = os.path.join(script_dir, "scripts")
-script_path = os.path.join(pdb_dir, "pdb_chainID.py") # script to determine chain ID
-fasta_file = os.path.join(output_dir, "sequence.fasta")
-#absolute_path = os.path.abspath(output_dir)
-#print(f"DeepTMHMM prediction results are in {absolute_path}")
 
 # Define functions
 # -----------------------------------------------------------------------------
