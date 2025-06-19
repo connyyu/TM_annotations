@@ -524,20 +524,21 @@ with col2:
 
 # DeepTMHMM plot
 # -----------------------------------------------------------------------------
-        
-if uniprot_ac == default_unp:
-    plot_path = os.path.join(demo_dir, "plot.png")
-else:
-    plot_path = os.path.join(output_dir, "plot.png")
-st.markdown("<a name='tmhmm_plot'></a>", unsafe_allow_html=True)
-if os.path.exists(plot_path):
-    st.markdown("##### DeepTMHMM Plot")
-    img = mpimg.imread(plot_path)
-    plt.imshow(img)
-    plt.axis('off')
-    st.pyplot(plt)
-else:
-    st.warning("TM prediction not available.")
+col1, col2 = st.columns([3, 2])
+with col1:  
+    if uniprot_ac == default_unp:
+        plot_path = os.path.join(demo_dir, "plot.png")
+    else:
+        plot_path = os.path.join(output_dir, "plot.png")
+    st.markdown("<a name='tmhmm_plot'></a>", unsafe_allow_html=True)
+    if os.path.exists(plot_path):
+        st.markdown("##### DeepTMHMM Plot")
+        img = mpimg.imread(plot_path)
+        plt.imshow(img)
+        plt.axis('off')
+        st.pyplot(plt)
+    else:
+        st.warning("TM prediction not available.")
 
 # Acknowledgement
 # -----------------------------------------------------------------------------
