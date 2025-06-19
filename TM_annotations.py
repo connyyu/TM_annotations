@@ -14,7 +14,7 @@ import matplotlib.image as mpimg
 import time
 
 # Sidebar, title, parameters
-st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮")
+st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮", layout="wide")
 
 default_unp = 'Q63008'
 default_pdb = '7UV0'
