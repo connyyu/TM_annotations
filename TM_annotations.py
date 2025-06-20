@@ -274,10 +274,10 @@ def viewpdb(structure, pred, sequence, af2_tag):
         st.error(f"Failed to get chain IDs: {e}")
 
         if not chain_ids:
-            chain_ids = ['A']
+            chain_ids =  ['A']
     except Exception as e:
         st.error(f"Error fetching chain IDs: {e}")
-        chain_ids = ['A']
+        chain_ids =  ['A']
 
     if 'chain_ids' not in st.session_state:
         st.session_state.chain_ids = chain_ids
@@ -285,7 +285,7 @@ def viewpdb(structure, pred, sequence, af2_tag):
         st.session_state.chain_ids = chain_ids
 
     if af2_tag == 1:
-        chain_ids = ['A']
+        chain_ids =  ['A']
     
     for chain_id in chain_ids:
         view.setStyle({'model': -1, 'chain': chain_id}, {
@@ -486,14 +486,14 @@ with col1:
         af2_tag = 0
         viewpdb(pdb_structure, '', sequence, af2_tag)
         chain_ids = st.session_state.chain_ids
-        st.caption(f"PDB:{pdb_code} ({chain_ids})  with DeepTMHMM predictions.")
+        st.caption(f"PDB:{pdb_code} ({chain_ids}) with DeepTMHMM predictions.")
     else:
         sequence = st.session_state.get("sequence", None)
         pred = get_pred_from_file()
         af2_tag = 0
         viewpdb(pdb_structure, pred, sequence, af2_tag)
         chain_ids = st.session_state.chain_ids
-        st.caption(f"PDB:{pdb_code} ({chain_ids})  with DeepTMHMM predictions.")
+        st.caption(f"PDB:{pdb_code} ({chain_ids}) with DeepTMHMM predictions.")
 
 with col2:
     output_str = ""
