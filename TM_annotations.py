@@ -476,24 +476,20 @@ col1, col2 = st.columns([3, 2])
 
 # Display PDB structure with DeepTMHMM prediction (output)
 with col1:
-    if pdb_structure == None:
+    if pdb_code == default_pdb:
         pdb_structure = fetch_pdb_structure(default_pdb)
     else:
         pdb_structure = st.session_state.get("pdb_structure", None)
         
     if sequence == None:
         sequence = fetch_uniprot_sequence(default_unp)
-        af2_tag = 0
-        viewpdb(pdb_structure, '', sequence, af2_tag)
-        chain_ids = st.session_state.chain_ids
-        st.caption(f"PDB:{pdb_code} ({chain_ids})  with DeepTMHMM predictions.")
     else:
         sequence = st.session_state.get("sequence", None)
         pred = get_pred_from_file()
-        af2_tag = 0
-        viewpdb(pdb_structure, pred, sequence, af2_tag)
-        chain_ids = st.session_state.chain_ids
-        st.caption(f"PDB:{pdb_code} ({chain_ids})  with DeepTMHMM predictions.")
+        
+    viewpdb(pdb_structure, pred, sequence, af2_tag=0)
+    chain_ids = st.session_state.chain_ids
+    st.caption(f"PDB:{pdb_code} ({chain_ids}) with DeepTMHMM predictions.")
 
 with col2:
     output_str = ""
