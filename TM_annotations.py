@@ -14,7 +14,7 @@ import matplotlib.image as mpimg
 import time
 
 # Sidebar, title, parameters
-st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮")
+st.set_page_config(page_title="Haku - Transmembrane annotations", page_icon="💮", layout="wide", initial_sidebar_state="expanded")
 
 default_unp = 'Q63008'
 default_pdb = '7UV0'
@@ -476,24 +476,20 @@ col1, col2 = st.columns([3, 2])
 
 # Display PDB structure with DeepTMHMM prediction (output)
 with col1:
-    if pdb_structure == None:
+    if pdb_code == default_pdb:
         pdb_structure = fetch_pdb_structure(default_pdb)
     else:
         pdb_structure = st.session_state.get("pdb_structure", None)
         
     if sequence == None:
         sequence = fetch_uniprot_sequence(default_unp)
-        af2_tag = 0
-        viewpdb(pdb_structure, '', sequence, af2_tag)
-        chain_ids = st.session_state.chain_ids
-        st.caption(f"PDB:{pdb_code} ({chain_ids}) with DeepTMHMM predictions.")
     else:
         sequence = st.session_state.get("sequence", None)
         pred = get_pred_from_file()
-        af2_tag = 0
-        viewpdb(pdb_structure, pred, sequence, af2_tag)
-        chain_ids = st.session_state.chain_ids
-        st.caption(f"PDB:{pdb_code} ({chain_ids}) with DeepTMHMM predictions.")
+        
+    viewpdb(pdb_structure, pred, sequence, af2_tag=0)
+    chain_ids = st.session_state.chain_ids
+    st.caption(f"PDB:{pdb_code} ({chain_ids}) with DeepTMHMM predictions.")
 
 with col2:
     output_str = ""
@@ -524,20 +520,21 @@ with col2:
 
 # DeepTMHMM plot
 # -----------------------------------------------------------------------------
-        
-if uniprot_ac == default_unp:
-    plot_path = os.path.join(demo_dir, "plot.png")
-else:
-    plot_path = os.path.join(output_dir, "plot.png")
-st.markdown("<a name='tmhmm_plot'></a>", unsafe_allow_html=True)
-if os.path.exists(plot_path):
-    st.markdown("##### DeepTMHMM Plot")
-    img = mpimg.imread(plot_path)
-    plt.imshow(img)
-    plt.axis('off')
-    st.pyplot(plt)
-else:
-    st.warning("TM prediction not available.")
+col1, col2 = st.columns([3, 2])
+with col1:  
+    if uniprot_ac == default_unp:
+        plot_path = os.path.join(demo_dir, "plot.png")
+    else:
+        plot_path = os.path.join(output_dir, "plot.png")
+    st.markdown("<a name='tmhmm_plot'></a>", unsafe_allow_html=True)
+    if os.path.exists(plot_path):
+        st.markdown("##### DeepTMHMM Plot")
+        img = mpimg.imread(plot_path)
+        plt.imshow(img)
+        plt.axis('off')
+        st.pyplot(plt)
+    else:
+        st.warning("TM prediction not available.")
 
 # Acknowledgement
 # -----------------------------------------------------------------------------
