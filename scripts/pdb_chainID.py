@@ -79,10 +79,11 @@ def fetch_uniprot_id(uniprot_ac):
         return data.get('uniProtkbId', None)
     return None
 
-def parse_uniprot_mapping(cif_file, chains_to_check=None):
+def parse_uniprot_mapping(cif_file):
     uniprot_mapping = {}
     uniprot_ids = []
     chain_mapping = {}
+    ref_id_to_entity_id = {}
 
     fallback_accession = None
     fallback_ID = None
@@ -91,6 +92,7 @@ def parse_uniprot_mapping(cif_file, chains_to_check=None):
     with open(cif_file, 'r') as f:
         lines = f.readlines()
 
+    # Scan for fallbacks
     for i, line in enumerate(lines):
         line = line.strip()
         if line.startswith('_struct_ref.pdbx_db_accession'):
@@ -125,34 +127,65 @@ def parse_uniprot_mapping(cif_file, chains_to_check=None):
     while i < len(lines):
         line = lines[i].strip()
 
-        if line.startswith('_struct_ref.pdbx_db_accession'):
-            j = i + 1
-            while j < len(lines) and not lines[j].startswith('loop_') and lines[j].strip():
-                line_content = lines[j].strip()
-                
-                # Skip lines that are part of multi-line sequences (start with ; or are continuation)
-                if line_content.startswith(';') or line_content.endswith(';'):
-                    if line_content.startswith(';') and not line_content.endswith(';'):
-                        j += 1
-                        while j < len(lines):
-                            if lines[j].strip().endswith(';'):
-                                break
-                            j += 1
-                    j += 1
-                    continue
-                parts = line_content.split()
-                if 'UNP' in parts and len(parts) >= 4:  # Need at least entity_id, UNP, db_code, accession
-                    entity_id = parts[0]
-                    uniprot_id = parts[2]
-                    uniprot_accession = parts[3]
-                    # Validate that the accession looks like a UniProt accession
-                    if len(uniprot_accession) >= 6 and '-' not in uniprot_accession and '_' not in uniprot_accession:
-                        uniprot_mapping[entity_id] = uniprot_accession
-                        uniprot_ids.append((entity_id, uniprot_id))
-                j += 1
-            i = j
-            continue
+        if line.startswith('loop_'):
+            struct_ref_headers = []
+            header_line_idx = i + 1
+            while header_line_idx < len(lines):
+                header_line = lines[header_line_idx].strip()
+                if header_line.startswith('_struct_ref.'):
+                    struct_ref_headers.append(header_line)
+                    header_line_idx += 1
+                elif header_line.startswith('_') and not header_line.startswith('_struct_ref.'):
+                    break
+                else:
+                    break
 
+            if struct_ref_headers:
+                db_name_idx = db_code_idx = entity_id_idx = accession_idx = ref_id_idx = None
+
+                for idx, header in enumerate(struct_ref_headers):
+                    if header == '_struct_ref.id':
+                        ref_id_idx = idx
+                    elif header == '_struct_ref.db_name':
+                        db_name_idx = idx
+                    elif header == '_struct_ref.db_code':
+                        db_code_idx = idx
+                    elif header == '_struct_ref.entity_id':
+                        entity_id_idx = idx
+                    elif header == '_struct_ref.pdbx_db_accession':
+                        accession_idx = idx
+
+                data_line_idx = header_line_idx
+                while data_line_idx < len(lines):
+                    data_line = lines[data_line_idx].strip()
+                    if not data_line or data_line.startswith('#'):
+                        data_line_idx += 1
+                        continue
+                    if data_line.startswith('loop_') or data_line.startswith('_'):
+                        break
+
+                    parts = data_line.split()
+
+                    if (None not in (ref_id_idx, db_name_idx, db_code_idx, entity_id_idx, accession_idx) and
+                        len(parts) > max(ref_id_idx, db_name_idx, db_code_idx, entity_id_idx, accession_idx)):
+                        
+                        if parts[db_name_idx] == 'UNP':
+                            ref_id = parts[ref_id_idx]
+                            entity_id = parts[entity_id_idx]
+                            uniprot_id = parts[db_code_idx]
+                            uniprot_accession = parts[accession_idx]
+
+                            ref_id_to_entity_id[ref_id] = entity_id
+
+                            if len(uniprot_accession) >= 6 and '-' not in uniprot_accession and '_' not in uniprot_accession:
+                                uniprot_mapping[entity_id] = uniprot_accession
+                                uniprot_ids.append((entity_id, uniprot_id))
+
+                    data_line_idx += 1
+                i = data_line_idx
+                continue
+
+        # struct_ref_seq processing:
         elif line.startswith('_struct_ref_seq.align_id'):
             i += 1
             while i < len(lines):
@@ -160,9 +193,20 @@ def parse_uniprot_mapping(cif_file, chains_to_check=None):
                 if not next_line or next_line.startswith(('loop_', '#')):
                     break
                 parts = next_line.split()
-                if len(parts) > 3:
-                    entity_id, chain_id = parts[1], parts[3]
-                    chain_mapping.setdefault(entity_id, set()).add(chain_id)
+                if len(parts) > 8:
+                    ref_id = parts[1]
+                    chain_id = parts[3]
+                    uniprot_accession = parts[8]
+
+                    entity_id = ref_id_to_entity_id.get(ref_id)
+
+                    if entity_id:
+                        chain_mapping.setdefault(entity_id, set()).add(chain_id)
+                        if (entity_id not in uniprot_mapping and
+                            len(uniprot_accession) >= 6 and 
+                            '-' not in uniprot_accession and 
+                            '_' not in uniprot_accession):
+                            uniprot_mapping[entity_id] = uniprot_accession
                 i += 1
             continue
 
@@ -179,8 +223,10 @@ def parse_uniprot_mapping(cif_file, chains_to_check=None):
                     if len(sifts_accession) >= 6 and '-' not in sifts_accession:
                         sifts_mapping[entity_id] = sifts_accession
                         sifts_chain_mapping.setdefault(entity_id, set()).add(chain_id)
+
         i += 1
 
+    # Use fallback if no mapping found
     if not uniprot_mapping:
         if sifts_mapping:
             fallback_entity = sorted(sifts_mapping.keys())[0]
@@ -198,6 +244,7 @@ def parse_uniprot_mapping(cif_file, chains_to_check=None):
         else:
             chain_mapping[fallback_entity] = set([fallback_chain] if fallback_chain else [])
 
+    # Final reconciliation
     final_uniprot_mapping = {}
     final_uniprot_ids = []
     final_chain_mapping = {}
@@ -207,12 +254,8 @@ def parse_uniprot_mapping(cif_file, chains_to_check=None):
         uniprot_id = next((uid for eid, uid in uniprot_ids if eid == entity), None)
         sifts_ac = sifts_mapping.get(entity, None)
 
-        # Use SIFTS AC if available; else original AC
         final_ac = sifts_ac if sifts_ac else original_ac
-
-        # Use only original chains — NO merging with SIFTS chains
-        chains_orig = chain_mapping[entity]
-        final_chains = sorted(list(chains_orig))
+        final_chains = sorted(list(chain_mapping[entity]))
 
         final_uniprot_mapping[entity] = final_ac
         final_uniprot_ids.append((entity, uniprot_id))
