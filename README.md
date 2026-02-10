@@ -22,8 +22,8 @@ This repository contains a Streamlit app that annotates transmembrane topology o
 
 ## PyMOL plugin
 
-In PyMOL 3.0, Plugin -> Plugin Manager -> Install from PyMOLWiki or any URL:
-https://github.com/connyyu/TM_annotations/blob/main/scripts/colortm.py
+In PyMOL 3.0, Plugin -> Plugin Manager -> Install from PyMOLWiki or any URL:<br>
+https://github.com/connyyu/TM_annotations/blob/main/scripts/colortm.py<br>
 Usage: colortm <object_name>, <uniprot_accession>
     
 ## Author
