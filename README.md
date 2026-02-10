@@ -9,6 +9,7 @@ This repository contains a Streamlit app that annotates transmembrane topology o
 - Retrieves transmembrane topology annotations from a UniProt entry.
 - Map UniProt annotation onto a protein structure using updated mmCIF files from PDBe..
 - Run a DeepTMHMM prediction and map the predicted topology onto the structure.
+- Independent Python script to run as a PyMOL plugin.
   
 ### Input
 - **UniProt accession**
@@ -18,6 +19,12 @@ This repository contains a Streamlit app that annotates transmembrane topology o
 
 - **Python 3.x**
 - Python libraries: `streamlit`, `py3Dmol`, `pybiolib`, `requests`, `matplotlib`.
+
+## PyMOL plugin
+
+In PyMOL 3.0, Plugin -> Plugin Manager -> Install from PyMOLWiki or any URL:
+https://github.com/connyyu/TM_annotations/blob/main/scripts/colortm.py
+Usage: colortm <object_name>, <uniprot_accession>
     
 ## Author
 
