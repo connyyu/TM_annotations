@@ -34,13 +34,6 @@ with st.sidebar:
     if guide:
         st.session_state.guide = True
 
-st.sidebar.markdown("""
-    <a href='https://github.com/connyyu' target='_blank'>
-        <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1024px-Octicons-mark-github.svg.png' 
-        style='position: fixed; bottom: 3%; left: 3%; transform: translateX(-50%); width: 30px; height: 30px;'/>
-    </a>
-""", unsafe_allow_html=True)
-
 st.markdown("<a name='top_title'></a>", unsafe_allow_html=True)
 st.markdown("#### Visualise transmembrane annotation on a protein structure.")
 
